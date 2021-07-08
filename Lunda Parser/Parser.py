@@ -14,9 +14,7 @@ logger = logging.getLogger('ld')
 ParserResult = collections.namedtuple(
     'ParserResult',
     (
-        'brand',
-        'huend',
-        'price',
+
     )
 )
 
@@ -70,35 +68,46 @@ class Client:
             self.pars_product_table(product_row=product_row)
 
     def pars_product_table(self, product_row):
-        product_items = product_row.select('tr.products-table__row')
+        product_items = product_row.select('tr')
         if not product_items:
             logger.error('no items')
         for product_item in product_items:
             self.pars_product_items(product_item=product_item)
 
     def pars_product_items(self, product_item):
+        product_chars_titles = product_item.select('th.products-table__header')
         product_chars = product_item.select('td.products-table__item')
+        #print(product_chars_titles)
+        titles = []
         chars = []
         if not product_chars:
             logger.error('no chars')
+        for product_chars_title in product_chars_titles:
+            title = self.char_title(product_chars_title=product_chars_title)
+            chars_title = title
+            titles.append(chars_title)
+            print(titles)
         for product_char in product_chars:
             # print(product_char)
             name = self.char_name(product_char=product_char)
-            title = self.char_title(product_char=product_char)
-            char = [title, name]
+            #title = self.char_title(product_char=product_char)
+            char = name
             chars.append(char)
+            #print(name)
+        print(titles)
         print(chars)
 
         return chars
 
-    def char_title(self, product_char):
-        title = product_char.get('title')
+    def char_title(self, product_chars_title):
+        title = product_chars_title.get_text()
         return title
 
     def char_name(self, product_char):
         name = product_char.get_text()
         r = name.strip()
         return r #title, name.strip()
+
 
     def save_results(self):
         path = 'D:/PythonProg/Parsers/Lunda Parser/test.csv'
